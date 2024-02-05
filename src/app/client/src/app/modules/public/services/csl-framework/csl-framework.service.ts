@@ -40,8 +40,6 @@ export class CslFrameworkService {
   public defaultFwCategories;
   constructor(@Inject('CS_FRAMEWORK_SERVICE') private csFrameworkService: CsFrameworkService, private channelService: ChannelService, private configService: ConfigService, public formService: FormService
   ) {
-    this.selectedFramework = localStorage.getItem('selectedFramework');
-
   }
 
   /**
@@ -54,6 +52,7 @@ export class CslFrameworkService {
       this.channelService.getFrameWork(channelId).subscribe((channelData: any) => {
         this.defaultFramework = _.get(channelData, 'result.channel.defaultFramework');
         let selectedFW = this.defaultFramework;
+        localStorage.setItem('selectedFramework', selectedFW);
         this.setFWCatConfigFromCsl(selectedFW);
       });
     } else {
@@ -118,7 +117,6 @@ export class CslFrameworkService {
         result.push(keyValueObj);
       }
     });
-    console.log('contentData', result);
     return result;
   }
   /**
@@ -132,10 +130,9 @@ export class CslFrameworkService {
     return new Promise<void>((resolve, reject) => {
       if (userSelFramework) {
         this.csFrameworkService.getFrameworkConfigMap(userSelFramework, {
-          apiPath: '/api/framework/v1/'
+          apiPath: '/api/framework/v1'
         }).subscribe(
           (fwData) => {
-            console.log('getFrameworkConfigMap success', fwData);
             localStorage.removeItem('fwCategoryObject');
             localStorage.setItem('fwCategoryObject', JSON.stringify(fwData));
             localStorage.setItem('selectedFramework', userSelFramework);
@@ -177,10 +174,9 @@ export class CslFrameworkService {
   public setFwCatObjConfigFromCsl(userSelFramework: any): void {
     if (userSelFramework) {
       this.csFrameworkService.getFrameworkConfig(userSelFramework, {
-        apiPath: '/api/framework/v1/'
+        apiPath: '/api/framework/v1'
       }).subscribe(
         (fwData) => {
-          console.log('getFrameworkConfig success', fwData);
           localStorage.removeItem('fwCategoryObjectValues');
           localStorage.setItem('fwCategoryObjectValues', JSON.stringify(fwData));
         },
@@ -245,14 +241,13 @@ export class CslFrameworkService {
    */
   private getFormDetails(rooOrgID) {
     this.defaultFwCategories = this.getFrameworkCategoriesObject();
+    let slectedFw = localStorage.getItem('selectedFramework');
     const formServiceInputParams = {
       formType: 'contentcategory',
       formAction: 'menubar',
       contentType: 'global',
-      // framework: this.selectedFramework,
-      // component: 'portal'
     };
-    return this.formService.getFormConfig(formServiceInputParams, this.rootOrgId).pipe(
+    return this.formService.getFormConfig(formServiceInputParams).pipe(
       catchError(error => {
         console.error('Error fetching form config:', error);
         return of(this.defaultFwCategories); // Return default data in case of error
@@ -268,7 +263,7 @@ export class CslFrameworkService {
  */
   setTransFormGlobalFilterConfig(rooOrgID?) {
     let filterResponseData;
-    this.rootOrgId =  rooOrgID;
+    this.rootOrgId = rooOrgID;
     this.getFormDetails(rooOrgID).subscribe(responseData => {
       const allTabData = _.find(responseData, (o) => o.title === 'frmelmnts.tab.all');
       if (allTabData) {
@@ -278,22 +273,22 @@ export class CslFrameworkService {
         filterResponseData = this.defaultFwCategories;
       }
       let transformedObject: any = {};
-      filterResponseData.map((filter, index) => {
-        transformedObject[`fwCategory${index + 1}`] = {
-          index: filter?.index,
-          code: filter?.code,
-          alternativeCode: filter?.alternativeCode ? filter?.alternativeCode : filter?.code,
-          label: filter?.label,
-          translation: filter?.translation,
-          type: filter?.type
+      if (filterResponseData) {
+        filterResponseData.map((filter, index) => {
+          transformedObject[`fwCategory${index + 1}`] = {
+            index: filter?.index,
+            code: filter?.code,
+            alternativeCode: filter?.alternativeCode ? filter?.alternativeCode : filter?.code,
+            label: filter?.label,
+            type: filter?.type
 
-        };
-      });
+          };
+        });
+      }
       localStorage.removeItem('globalFilterObject');
       localStorage.removeItem('globalFilterObjectValues');
       localStorage.setItem('globalFilterObjectValues', JSON.stringify(filterResponseData))
       localStorage.setItem('globalFilterObject', JSON.stringify(transformedObject))
-      console.log('SetTransform', localStorage.getItem('globalFilterObject'))
 
     })
   }
@@ -372,8 +367,8 @@ export class CslFrameworkService {
   transformDataForCC() {
     let transformData = this.getGlobalFilterCategoriesObject();
     let resCCdata: any[] = [{
-      "code": "lastPublishedBy",
-      "name": "Published by"
+      "code": "organisation",
+      "name": "Publisher"
     }];
     transformData?.forEach((filter) => {
       let typeCheck = filter?.type === 'filter' ? true : false;
@@ -389,5 +384,20 @@ export class CslFrameworkService {
     });
     return resCCdata;
   }
-
+  /**
+ * @description Transforms the keys of obj1 based on exclusion criteria from obj2.
+ * @param {Object} obj1 - The source object to filter keys from.
+ * @param {Array<Object>} obj2 - The array of objects containing keys to be excluded.
+ * @returns {Object} - The filtered object with keys from obj1, excluding those present in obj2.
+ */
+  transformSelectedData(obj1, obj2) {
+    const excludedKeys = obj2.map(item => item.code);
+    const filteredObject = {};
+    for (const key in obj1) {
+      if (excludedKeys.includes(key)) {
+        filteredObject[key] = obj1[key];
+      }
+    }
+    return filteredObject;
+  }
 }

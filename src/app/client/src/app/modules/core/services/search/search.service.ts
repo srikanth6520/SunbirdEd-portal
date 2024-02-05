@@ -274,7 +274,7 @@ export class SearchService {
         }
       }
     };
-    option['data'] = this.updateOption(option);
+    // option['data'] = this.updateOption(option);
     if (requestParam['pageNumber'] && requestParam['limit']) {
       option.data.request['offset'] = (requestParam.pageNumber - 1) * requestParam.limit;
     }
@@ -519,9 +519,8 @@ export class SearchService {
       if (foundFilter) {
         const { index, label, placeHolder } = foundFilter;
         facet['index'] = index.toString();
-        facet['label'] = label;
-        facet['placeholder'] = placeHolder;
-
+        facet['label'] = this.resourceService.frmelmnts.lbl[label] || label;
+        facet['placeholder'] = this.resourceService.frmelmnts.lbl[placeHolder] || placeHolder;
         switch (facet.name) {
           case 'channel':
             facet['values'] = _.map(facet.values || [], value => ({ ...value, name: value.orgName }));
@@ -533,12 +532,6 @@ export class SearchService {
             facet['name'] = 'mediaType';
             facet['mimeTypeList'] = this.mimeTypeList;
             break;
-          // case 'audience':
-          //   facet['placeholder'] = this.resourceService.frmelmnts.lbl.selectMeantFor;
-          //   break;
-          // case 'additionalCategories':
-          //   facet['placeholder'] = this.resourceService.frmelmnts.lbl.selectAdditionalCategory;
-          //   break;
           default:
             break;
         }

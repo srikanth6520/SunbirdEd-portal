@@ -71,7 +71,9 @@ describe('ProfileFrameworkPopupComponent', () => {
     const mockCslFrameworkService: Partial<CslFrameworkService> = {
         getFrameworkCategories: jest.fn(),
         getFrameworkCategoriesObject: jest.fn(),
-        setFWCatConfigFromCsl: jest.fn()
+        setFWCatConfigFromCsl: jest.fn(),
+        transformSelectedData: jest.fn(),
+        setTransFormGlobalFilterConfig: jest.fn()
     };
     const mockConfigService: Partial<ConfigService> = {
     appConfig: {
@@ -175,16 +177,39 @@ describe('ProfileFrameworkPopupComponent', () => {
         expect(component.showButton).toBeFalsy();
     });
     it('should call onSubmitForm method', () => {
+        const selectedData = { fw1: 'test1', fw2: 'test2'};
+        const transformedData = { fw1: 'test1'};
+        const cloneDeepMock = jest.spyOn(_, 'cloneDeep').mockReturnValue(selectedData);
+        const codeValue = 'code1';
         jest.spyOn(userService, 'setUserFramework');
         profileService.updateProfile = jest.fn(() => of({
             'result': {
                 'response': 'SUCCESS'
             }
         })) as any;
+        mockCslFrameworkService.transformSelectedData = jest.fn(() => of(transformedData));
+        component.selectedOption = selectedData;
+        component.frameworkCategoriesObject = {fw1: 'test1'}
+        component.frameworkCategories = {
+            fwCategory1: {
+              code: codeValue,
+            },
+          };
         component.onSubmitForm();
+        expect(cloneDeepMock).toHaveBeenCalledWith(component.selectedOption);
+        expect(mockCslFrameworkService.transformSelectedData).toHaveBeenCalledWith(
+            selectedData,
+            component.frameworkCategoriesObject
+          );
         expect(userService.setUserFramework).toBeCalled();
     });
+
+
     it('should call onSubmitForm method', () => {
+        const selectedData = { fw1: 'test1', fw2: 'test2'};
+        const transformedData = { fw1: 'test1'};
+        const cloneDeepMock = jest.spyOn(_, 'cloneDeep').mockReturnValue(selectedData);
+        const codeValue = 'code1';
         jest.spyOn(userService, 'setUserFramework');
         localStorage.setItem('userType', 'student');
         profileService.updateProfile = jest.fn(() => of({
@@ -199,10 +224,29 @@ describe('ProfileFrameworkPopupComponent', () => {
         })) as any;
         component.isStepper = true;
         component.isGuestUser = true;
+        mockCslFrameworkService.transformSelectedData = jest.fn(() => of(transformedData));
+        component.selectedOption = selectedData;
+        component.frameworkCategoriesObject = {fw1: 'test1'}
+        component.frameworkCategories = {
+            fwCategory1: {
+              code: codeValue,
+            },
+          };
+
         component.onSubmitForm();
+        expect(cloneDeepMock).toHaveBeenCalledWith(component.selectedOption);
+        expect(mockCslFrameworkService.transformSelectedData).toHaveBeenCalledWith(
+            selectedData,
+            component.frameworkCategoriesObject
+          );
+
         expect(toasterService.success).toBeCalledWith(resourceService.messages.smsg.m0058);
     });
     it('should call onSubmitForm method with error', () => {
+        const selectedData = { fw1: 'test1', fw2: 'test2'};
+        const transformedData = { fw1: 'test1'};
+        const cloneDeepMock = jest.spyOn(_, 'cloneDeep').mockReturnValue(selectedData);
+        const codeValue = 'code1';
         jest.spyOn(userService, 'setUserFramework');
         localStorage.setItem('userType', 'student');
         profileService.updateProfile = jest.fn(() => of({
@@ -217,7 +261,20 @@ describe('ProfileFrameworkPopupComponent', () => {
         })) as any;
         component.isStepper = true;
         component.isGuestUser = true;
+        mockCslFrameworkService.transformSelectedData = jest.fn(() => of(transformedData));
+        component.selectedOption = selectedData;
+        component.frameworkCategoriesObject = {fw1: 'test1'}
+        component.frameworkCategories = {
+            fwCategory1: {
+              code: codeValue,
+            },
+          };
         component.onSubmitForm();
+        expect(cloneDeepMock).toHaveBeenCalledWith(component.selectedOption);
+        expect(mockCslFrameworkService.transformSelectedData).toHaveBeenCalledWith(
+            selectedData,
+            component.frameworkCategoriesObject
+          );
         expect(toasterService.error).toBeCalledWith(resourceService.messages.emsg.m0005);
     });
 
@@ -281,8 +338,10 @@ describe('ProfileFrameworkPopupComponent', () => {
         jest.spyOn((component as any).cslFrameworkService, 'setFWCatConfigFromCsl').mockResolvedValueOnce(undefined);
         jest.spyOn((component as any).cslFrameworkService, 'getFrameworkCategories').mockReturnValueOnce(mockCategories);
         jest.spyOn((component as any).cslFrameworkService, 'getFrameworkCategoriesObject').mockReturnValueOnce(mockCategoriesObject);
+        jest.spyOn((component as any).cslFrameworkService, 'setTransFormGlobalFilterConfig').mockResolvedValueOnce(undefined);
         await component['updateFrameworkCategories'](frameWorkId);
         expect((component as any).cslFrameworkService.setFWCatConfigFromCsl).toHaveBeenCalledWith(frameWorkId);
+        expect((component as any).cslFrameworkService.setTransFormGlobalFilterConfig).toHaveBeenCalledWith();
         expect(component['frameworkCategories']).toEqual(mockCategories);
         expect(component['frameworkCategoriesObject']).toEqual(mockCategoriesObject);
     });
@@ -324,5 +383,121 @@ describe('ProfileFrameworkPopupComponent', () => {
         });
     });
 
+    it('should handle getFormOptionsForCustodianOrgForGuestUser', () => {
+        const sampleCustodianOrgData = {
+            range: [
+                { index: 1, label: 'Option 1' },
+                { index: 2, label: 'Option 2' },
+            ],
+        };
+        jest.spyOn(component, 'getCustodianOrgDataForGuest' as any).mockReturnValue(of(sampleCustodianOrgData));
+        component['getFormOptionsForCustodianOrgForGuestUser']().subscribe((result) => {
+        expect(result).toEqual({});
+        });
+    });
+
+    xit('should handle update mode and update selectedOption, frameWorkId, _formFieldProperties, and call mergeBoard and getUpdatedFilters', async () => {
+        component.frameworkCategories = {
+            fwCategory1: { code: 'someCode', label: 'Some Label' },
+        };
+
+        const selectedOptionMock = {
+            [component.frameworkCategories.fwCategory1.code]: ['value1'],
+        };
+
+        const custOrgFrameworksMock = [
+            { name: 'value1', identifier: 'id1' },
+            { name: 'value2', identifier: 'id2' },
+        ];
+
+        const formFieldPropertiesMock = {
+            field1: 'value1',
+            field2: 'value2',
+        };
+
+        const spyOnGet = jest.spyOn(_, 'get' as any).mockImplementation(() => 'value1');
+        const spyOnFind = jest.spyOn(_, 'find' as any).mockReturnValue({ 'name': 'value1', 'identifier': 'id1' });
+        const spyOnGetFormatedFilterDetails = jest.spyOn(component, 'getFormatedFilterDetails' as any).mockReturnValue(of(formFieldPropertiesMock));
+        const spyOnGetUpdatedFilters = jest.spyOn(component, 'getUpdatedFilters' as any).mockReturnValue(of({}));
+
+        component.selectedOption = selectedOptionMock;
+        component['custOrgFrameworks'] = custOrgFrameworksMock;
+        jest.spyOn(component['channelService'], 'getFrameWork').mockReturnValue(of({})as any);
+        await component['getFormOptionsForCustodianOrgForGuestUser']().toPromise();
+
+        expect(spyOnGet).toHaveBeenCalledWith(selectedOptionMock, `${component.frameworkCategories.fwCategory1.code}[0]`);
+        expect(component.selectedOption[component.frameworkCategories.fwCategory1.code]).toEqual('value1');
+        expect(spyOnFind).toHaveBeenCalledWith(component['custOrgFrameworks'], { 'name': 'value1' });
+        expect(component['frameWorkId']).toEqual('value1');
+        expect(spyOnGetFormatedFilterDetails).toHaveBeenCalled();
+        expect(component['_formFieldProperties']).toEqual(formFieldPropertiesMock);
+        expect(spyOnGetUpdatedFilters).toHaveBeenCalledWith(
+            expect.objectContaining({
+                code: 'someCode',
+                index: 1,
+                label: 'Some Label',
+                range: expect.arrayContaining([
+                    expect.any(String),
+                ]),
+            }),
+            true
+        );
+    });
+
+    it('should handle update mode and call getFormatedFilterDetails and mergeBoard', (done) => {
+        const dataMock = {
+            range: [
+                { index: 1, label: 'Label 1' },
+                { index: 2, label: 'Label 2' },
+            ],
+        };
+        const formFieldPropertiesMock = {
+            field1: 'value1',
+            field2: 'value2',
+        };
+        jest.spyOn(component, 'getCustodianOrgData' as any).mockReturnValue(of(dataMock));
+        jest.spyOn(_, 'cloneDeep').mockReturnValue(dataMock);
+        jest.spyOn(_, 'sortBy').mockReturnValue(dataMock.range);
+        jest.spyOn(_, 'get').mockReturnValue('value1');
+        jest.spyOn(_, 'find').mockReturnValue({ name: 'value1', identifier: 'id1' });
+        jest.spyOn(component, 'getFormatedFilterDetails' as any).mockReturnValue(of(formFieldPropertiesMock));
+        jest.spyOn(component, 'mergeBoard' as any).mockImplementation(() => { });
+        jest.spyOn(component, 'getUpdatedFilters' as any).mockReturnValue(of({}));
+        component.selectedOption = {
+        [component['frameworkCategories.fwCategory1.code']] : ['value1'],
+        };
+        component['custOrgFrameworks'] = [{ name: 'value1', identifier: 'id1' }];
+        component['getFormOptionsForCustodianOrg']().subscribe(() => {
+        expect(component.selectedOption[component['frameworkCategories.fwCategory1.code']]).toEqual('value1');
+        expect(component['getFormatedFilterDetails']).toHaveBeenCalled();
+        expect(component['mergeBoard']).toHaveBeenCalled();
+        done();
+        });
+    });
+
+    it('should handle non-update mode and return fieldOptions', () => {
+        const formFieldPropertiesMock = [
+            { code: 'value1', range: [] },
+        ];
+        const spyOnGetFormatedFilterDetails = jest.spyOn(component, 'getFormatedFilterDetails' as any).mockReturnValue(of(formFieldPropertiesMock));
+        component['getFormOptionsForOnboardedUser']().subscribe(() => {
+            expect(spyOnGetFormatedFilterDetails).toHaveBeenCalled();
+        });
+    });
+
+    xit('should return custodian organization data', async () => {
+        jest.spyOn(channelService, 'getFrameWork').mockReturnValue(of({} as any));
+        component['userService'] = { hashTagId: 'mockedHashTagId' } as any;
+        const getCustodianOrgDataSpy = jest.spyOn(component, 'getCustodianOrgData' as any);
+        const result = await component['getCustodianOrgData']().toPromise();
+        expect(result).toEqual({
+        range: [],
+        label: component.frameworkCategories?.fwCategory1?.label,
+        code: component.frameworkCategories?.fwCategory1?.code,
+        index: 1
+        });
+        expect(component['channelService'].getFrameWork).toHaveBeenCalledWith(component['userService'].hashTagId);
+        expect(getCustodianOrgDataSpy).toHaveBeenCalled();
+    });
 
 });
