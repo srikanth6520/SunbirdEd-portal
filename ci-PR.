@@ -41,5 +41,5 @@ jobs:
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
           docker push <docker_hub_username>/<image_name>:<tag>
         env:
-           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+           DOCKER_USERNAME: ${{ DOCKER_USERNAME }}
+           DOCKER_PASSWORD: ${{ DOCKER_PASSWORD }}
