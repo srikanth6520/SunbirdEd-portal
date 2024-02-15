@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - pr-ci-2
+      - master
 
 jobs:
   build:
