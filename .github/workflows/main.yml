@@ -21,7 +21,7 @@ jobs:
         uses: sonarsource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: 276b9dc9dd2a7c671e45c4d38c27e3442769165f
 
       - name: Run Snyk
         run: npx snyk test
