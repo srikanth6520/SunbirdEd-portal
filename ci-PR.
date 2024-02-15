@@ -34,12 +34,11 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-      - name: Build Docker image
-        run: docker build -t srikanth6520/new-nodejs:latest -f Dockerfile.new .
       - name: Push Docker image to Docker Hub
         run: |
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          docker push <docker_hub_username>/<image_name>:<tag>
+           docker push srikanth6520/new-nodejs:latest
         env:
-           DOCKER_USERNAME: ${{ DOCKER_USERNAME }}
-           DOCKER_PASSWORD: ${{ DOCKER_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
