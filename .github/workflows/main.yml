@@ -35,12 +35,12 @@ jobs:
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
           docker build -t srikanth6520/new-nodejs:latest .
         env:
-          DOCKER_USERNAME: srikanth6520
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Push Docker image to Docker Hub
         run: |
           docker push --verbose srikanth6520/new-nodejs:latest
         env:
-          DOCKER_USERNAME: srikanth6520
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
