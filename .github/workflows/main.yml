@@ -24,7 +24,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_ORGANIZATION_KEY: ${{ secrets.SONAR_ORGANIZATION_KEY }}
+        with:
+          args: >
+            -Dsonar.organization=srikanth6520
+            -Dsonar.projectKey=SunbirdEd-portal
 
       - name: Run Snyk
         run:  synk scan --output-format=json > synk_report.json
