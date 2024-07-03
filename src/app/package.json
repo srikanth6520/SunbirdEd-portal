@@ -98,7 +98,7 @@
     "ioredis": "4.19.4",
     "jsonwebtoken": "7.4.1",
     "jwks-rsa": "^2.0.4",
-    "kafka-node": "3.0.1",
+    "kafka-node": "4.0.0",
     "keycloak-connect": "git+https://github.com/project-sunbird/keycloak-nodejs-connect.git#release-2.5.0",
     "lodash": "4.17.15",
     "mathjax-full": "3.0.0",
