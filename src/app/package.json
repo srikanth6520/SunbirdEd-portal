@@ -70,7 +70,7 @@
     "@aws-sdk/s3-request-presigner": "^3.173.0",
     "@google-cloud/storage": "^6.5.2",
     "@project-sunbird/discussion-service": "0.0.6",
-    "@project-sunbird/ext-framework-server": "0.1.28",
+    "@project-sunbird/ext-framework-server": "8.0.0",
     "@project-sunbird/form-service": "0.0.15",
     "@project-sunbird/logger": "^0.0.9",
     "@project-sunbird/review-comment": "0.0.8",
@@ -115,7 +115,7 @@
     "sb_cache_manager": "file:libs/sb_cache_manager",
     "sb_telemetry_util": "file:libs/sb_telemetry_util",
     "sunbird-localization": "0.0.2",
-    "svg2img": "0.6.1",
+    "svg2img": "0.7.0",
     "ua-parser-js": "0.7.13",
     "uuid": "3.1.0",
     "uuid-validate": "0.0.3"
