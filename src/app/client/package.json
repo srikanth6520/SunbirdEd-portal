@@ -35,7 +35,7 @@
   },
   "private": true,
   "dependencies": {
-    "@angular-devkit/build-angular": "0.1102.19",
+    "@angular-devkit/build-angular": "12.0.0",
     "@angular/animations": "^11.2.14",
     "@angular/cdk": "11.2.13",
     "@angular/cli": "^11.2.19",
@@ -107,7 +107,7 @@
     "gulp-inject-string": "1.1.2",
     "gulp-rename": "2.0.0",
     "html2canvas": "1.0.0-rc.3",
-    "izimodal": "1.5.1",
+    "izimodal": "1.6.0",
     "jquery": "^3.5.1",
     "jquery.fancytree": "^2.35.0",
     "jsonld": "^5.2.0",
@@ -150,7 +150,7 @@
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.1102.18",
+    "@angular-devkit/build-angular": "~12.0.0",
     "@angular/language-service": "^11.2.14",
     "@types/jest": "^27.4.1",
     "@types/jquery": "^3.3.38",
