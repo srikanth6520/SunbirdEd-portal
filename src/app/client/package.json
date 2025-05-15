@@ -111,7 +111,7 @@
     "jquery": "^3.5.1",
     "jquery.fancytree": "^2.35.0",
     "jsonld": "^5.2.0",
-    "jsonld-signatures": "^6.0.0",
+    "jsonld-signatures": "^8.0.0",
     "jspdf": "1.5.3",
     "jszip": "^3.7.1",
     "katex": "^0.12.0",
